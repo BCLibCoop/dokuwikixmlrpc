@@ -228,6 +228,24 @@ class DokuWikiClient(object):
         except xmlrpclib.Fault, fault:
             raise DokuWikiXMLRPCError(fault)
 
+    def append_page(self, page_id, text, summary='', minor=False):
+        """Append a Wiki page on the remote Wiki.
+
+        Keyword arguments:
+        page_id -- valpage_id Wiki page page_id
+        text -- raw Wiki text (UTF-8 encoded)
+        sum -- summary
+        minor -- mark as minor edit
+
+        """
+        try:
+            params = {}
+            params['sum'] = summary
+            params['minor'] = minor
+            self._xmlrpc.wiki.appendPage(page_id, text, params)
+        except xmlrpclib.Fault, fault:
+            raise DokuWikiXMLRPCError(fault)
+
     def pagelist(self, namespace):
         """Lists all pages within a given namespace."""
         try:
@@ -263,6 +281,13 @@ class DokuWikiClient(object):
         """Return the recent changes since a given timestamp (UTC)."""
         try:
             return self._xmlrpc.wiki.getRecentChanges(timestamp)
+        except xmlrpclib.Fault, fault:
+            raise DokuWikiXMLRPCError(fault)
+
+    def recent_media_changes(self, timestamp):
+        """Return the media recent changes since a given timestamp (UTC)."""
+        try:
+            return self._xmlrpc.wiki.getRecentMediaChanges(timestamp)
         except xmlrpclib.Fault, fault:
             raise DokuWikiXMLRPCError(fault)
 
