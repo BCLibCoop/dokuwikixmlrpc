@@ -474,6 +474,7 @@ def main():
     """
     from optparse import OptionParser
 
+
     parser = OptionParser(version = '%prog ' + __version__)
 
     parser.set_usage('%prog -u <username> -w <wikiurl> -p <passwd> [options] [wiki:page]')
@@ -490,54 +491,6 @@ def main():
             dest = 'passwd',
             help = 'The user password.')
 
-    parser.add_option('--raw',
-            dest = 'page',
-            action = 'callback',
-            callback = Callback,
-            help = 'Return the raw Wiki text of a Wiki page.')
-
-    parser.add_option('--html',
-            dest = 'page_html',
-            action = 'callback',
-            callback = Callback,
-            help = 'Return the HTML body of a Wiki page.')
-
-    parser.add_option('--info',
-            dest = 'page_info',
-            action = 'callback',
-            callback = Callback,
-            help = 'Return some information about a Wiki page.')
-
-    parser.add_option('--changes',
-            dest = 'recent_changes',
-            action = 'callback',
-            callback = Callback,
-            help = 'List recent changes of the Wiki since timestamp.')
-
-    parser.add_option('--revisions',
-            dest = 'page_versions',
-            action = 'callback',
-            callback = Callback,
-            help = 'Liste page revisions since timestamp.')
-
-    parser.add_option('--backlinks',
-            dest = 'backlinks',
-            action = 'callback',
-            callback = Callback,
-            help = 'Return a list of pages that link back to a Wiki page.')
-
-    parser.add_option('--allpages',
-            dest = 'all_pages',
-            action = 'callback',
-            callback = Callback,
-            help = 'List all pages in the remote Wiki.')
-
-    parser.add_option('--links',
-            dest = 'links',
-            action = 'callback',
-            callback = Callback,
-            help = 'Return a list of links contained in a Wiki page.')
-
     parser.add_option('--time',
             dest = 'timestamp',
             type = 'int',
@@ -549,23 +502,27 @@ def main():
             help = 'Use HTTP Basic Authentication.',
             default=False)
 
-    parser.add_option('--dokuwiki-version',
-            dest = 'dokuwiki_version',
-            action = 'callback',
-            callback = Callback,
-            help = 'Return the DokuWiki version reported by the remote Wiki.')
 
-    parser.add_option('--rpc-version-supported',
-            dest = 'rpc_version_supported',
-            action = 'callback',
-            callback = Callback,
-            help = 'Return the supported RPC version reported by the remote Wiki.')
-    
-    parser.add_option('--acl-check',
-            dest = 'acl_check',
-            action = 'callback',
-            callback = Callback,
-            help = 'Return the permissions of a Wiki page.')
+    def callbackopt(func, *args, **kwargs):
+        parser.add_option(*args,
+                dest = str(func.__name__),
+                action = 'callback',
+                callback = Callback,
+                help = func.__doc__.split('\n', 1)[0],
+                **kwargs)
+
+    callbackopt(DokuWikiClient.dokuwiki_version, '--dokuwiki-version')
+    callbackopt(DokuWikiClient.rpc_version_supported, '--rpc-version-supported')
+    callbackopt(DokuWikiClient.all_pages, '--allpages')
+    callbackopt(DokuWikiClient.recent_changes, '--changes', '--recent-changes')
+
+    callbackopt(DokuWikiClient.page, '--raw', '--page-raw')
+    callbackopt(DokuWikiClient.page_html, '--html', '--page-html')
+    callbackopt(DokuWikiClient.page_info, '--info', '--page-info')
+    callbackopt(DokuWikiClient.page_versions, '--revisions', '--page-versions')
+    callbackopt(DokuWikiClient.backlinks, '--backlinks', '--page-backlinks')
+    callbackopt(DokuWikiClient.links, '--links','--page-links')
+    callbackopt(DokuWikiClient.acl_check, '--page-acl-check')
 
     parser.parse_args()
 
