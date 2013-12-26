@@ -421,6 +421,8 @@ class Callback(object):
                 timestamp = int(time())
             return (callback(timestamp), 'dict')
 
+        else:
+            raise Exception("Unsupported command %s" % (option,))
 
 def main():
     """Main function. Invoked when called as script.
