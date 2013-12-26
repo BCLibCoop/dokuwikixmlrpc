@@ -90,7 +90,7 @@ class DokuWikiClient(object):
 
     """
 
-    def __init__(self, url, user, passwd, http_basic_auth=False):
+    def __init__(self, url, user=None, passwd=None, http_basic_auth=False, verbose=False):
         """Initalize everything.
 
         Try to get a XML-RPC object. If this step fails a DokuWIKIXMLRPCError
@@ -103,6 +103,7 @@ class DokuWikiClient(object):
         self._user = user
         self._passwd = passwd
         self._http_basic_auth = http_basic_auth
+        self._verbose = verbose
         self._user_agent = ' '.join([ 'DokuWikiXMLRPC ',
                                       __version__,
                                       'by (www.chimeric.de)' ])
@@ -136,7 +137,7 @@ class DokuWikiClient(object):
         xmlrpclib.Transport.user_agent = self._user_agent
         xmlrpclib.SafeTransport.user_agent = self._user_agent
 
-        return xmlrpclib.ServerProxy(url)
+        return xmlrpclib.ServerProxy(url, verbose=self._verbose)
 
     def dokuwiki_version(self):
         """Return the DokuWiki version reported by the remote Wiki."""
@@ -367,9 +368,10 @@ class Callback(object):
         if parser.values.user and parser.values.wiki and parser.values.passwd:
             try:
                 self.dokuwiki = DokuWikiClient(parser.values.wiki,
-                                               parser.values.user,
-                                               parser.values.passwd,
-                                               parser.values.http_basic_auth)
+                                               user=parser.values.user,
+                                               passwd=parser.values.passwd,
+                                               http_basic_auth=parser.values.http_basic_auth,
+                                               verbose=parser.values.verbose)
             except DokuWikiXMLRPCError, error:
                 parser.error(error)
 
@@ -502,6 +504,11 @@ def main():
             help = 'Use HTTP Basic Authentication.',
             default=False)
 
+    parser.add_option('--verbose',
+            dest = 'verbose',
+            action = 'store_true',
+            help = 'Enable verbose output',
+            default=False)
 
     def callbackopt(func, *args, **kwargs):
         parser.add_option(*args,
