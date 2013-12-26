@@ -247,10 +247,12 @@ class DokuWikiClient(object):
         except xmlrpclib.Fault, fault:
             raise DokuWikiXMLRPCError(fault)
 
-    def pagelist(self, namespace):
+    def pagelist(self, namespace, **kwargs):
         """Lists all pages within a given namespace."""
+        options = {}
+        options.update(kwargs)
         try:
-            return self._xmlrpc.dokuwiki.getPagelist(namespace, {})
+            return self._xmlrpc.dokuwiki.getPagelist(namespace, options)
         except xmlrpclib.Fault, fault:
             raise DokuWikiXMLRPCError(fault)
 
@@ -451,14 +453,13 @@ class Callback(object):
         elif option in ('put_page'):
             raise Exception("TODO")
 
-        elif option in ('pagelist'):
-            raise Exception("TODO")
+        elif option in ('pagelist', 'list_files'):
+            page_id = self._get_page_id()
+            return (callback(page_id), 'list')
 
         elif option in ('get_file', 'put_file', 'delete_file'):
             raise Exception("TODO")
         elif option in ('file_info'):
-            raise Exception("TODO")
-        elif option in ('list_files'):
             raise Exception("TODO")
         elif option in ('set_locks'):
             raise Exception("TODO")
@@ -522,6 +523,8 @@ def main():
     callbackopt(DokuWikiClient.rpc_version_supported, '--rpc-version-supported')
     callbackopt(DokuWikiClient.all_pages, '--allpages')
     callbackopt(DokuWikiClient.recent_changes, '--changes', '--recent-changes')
+    callbackopt(DokuWikiClient.pagelist, '--pagelist')
+    callbackopt(DokuWikiClient.list_files, '--files-list')
 
     callbackopt(DokuWikiClient.page, '--raw', '--page-raw')
     callbackopt(DokuWikiClient.page_html, '--html', '--page-html')
