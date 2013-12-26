@@ -560,6 +560,12 @@ def main():
             action = 'callback',
             callback = Callback,
             help = 'Return the supported RPC version reported by the remote Wiki.')
+    
+    parser.add_option('--acl-check',
+            dest = 'acl_check',
+            action = 'callback',
+            callback = Callback,
+            help = 'Return the permissions of a Wiki page.')
 
     parser.parse_args()
 
