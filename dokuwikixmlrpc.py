@@ -415,7 +415,7 @@ class Callback(object):
 
         callback = self.dokuwiki.__getattribute__(option)
 
-        if option in ('page', 'page_html'):
+        if option in ('page', 'page_html', 'acl_check'):
             page_id = self._get_page_id()
 
             timestamp = self._parser.values.timestamp
@@ -445,6 +445,21 @@ class Callback(object):
             if not timestamp:
                 timestamp = int(time())
             return (callback(timestamp), 'dict')
+
+        elif option in ('put_page'):
+            raise Exception("TODO")
+
+        elif option in ('pagelist'):
+            raise Exception("TODO")
+
+        elif option in ('get_file', 'put_file', 'delete_file'):
+            raise Exception("TODO")
+        elif option in ('file_info'):
+            raise Exception("TODO")
+        elif option in ('list_files'):
+            raise Exception("TODO")
+        elif option in ('set_locks'):
+            raise Exception("TODO")
 
         else:
             raise Exception("Unsupported command %s" % (option,))
