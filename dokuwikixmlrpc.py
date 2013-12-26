@@ -110,7 +110,7 @@ class DokuWikiClient(object):
         self._xmlrpc = self._xmlrpc_init()
 
         try:
-            self.dokuwiki_version = self._dokuwiki_version()
+            self._dokuwiki_version = self.dokuwiki_version()
         except xmlrpclib.Fault, fault:
             raise DokuWikiXMLRPCError(fault)
 
@@ -138,8 +138,7 @@ class DokuWikiClient(object):
 
         return xmlrpclib.ServerProxy(url)
 
-
-    def _dokuwiki_version(self):
+    def dokuwiki_version(self):
         """Return the DokuWiki version reported by the remote Wiki."""
         try:
             return self._xmlrpc.dokuwiki.getVersion()
@@ -412,6 +411,9 @@ class Callback(object):
         elif option == 'all_pages':
             return (callback(), 'list')
 
+        elif option in ('dokuwiki_version', 'rpc_version_supported'):
+            return (callback(), 'plain')
+
         elif option == 'recent_changes':
             from time import time
             timestamp = self._parser.values.timestamp
@@ -504,6 +506,18 @@ def main():
             action = 'store_true',
             help = 'Use HTTP Basic Authentication.',
             default=False)
+
+    parser.add_option('--dokuwiki-version',
+            dest = 'dokuwiki_version',
+            action = 'callback',
+            callback = Callback,
+            help = 'Return the DokuWiki version reported by the remote Wiki.')
+
+    parser.add_option('--rpc-version-supported',
+            dest = 'rpc_version_supported',
+            action = 'callback',
+            callback = Callback,
+            help = 'Return the supported RPC version reported by the remote Wiki.')
 
     parser.parse_args()
 
